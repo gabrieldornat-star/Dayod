@@ -1,0 +1,722 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dayod</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #090909;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #252525;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 15px;
+}
+
+.menu-button, .secondary {
+  background: #222;
+  color: white;
+}
+
+.primary {
+  background: white;
+  color: black;
+  font-weight: bold;
+}
+
+.brand {
+  font-size: 25px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.container {
+  max-width: 850px;
+  margin: auto;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 45px;
+  margin-bottom: 10px;
+}
+
+.muted {
+  color: #999;
+}
+
+.panel {
+  background: #151515;
+  border: 1px solid #292929;
+  border-radius: 14px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.menu {
+  background: #151515;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: white;
+  margin: 5px 0;
+}
+
+.menu button:hover {
+  background: #292929;
+}
+
+.player {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.cover {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #252525;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 45px;
+  color: #777;
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+input {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  background: #101010;
+  color: white;
+  border: 1px solid #383838;
+  border-radius: 8px;
+}
+
+label {
+  display: block;
+  margin-top: 18px;
+  font-size: 14px;
+}
+
+input[type="range"] {
+  padding: 0;
+  accent-color: white;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.play {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: white;
+  color: black;
+  font-size: 18px;
+}
+
+.track {
+  display: grid;
+  grid-template-columns: 55px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.track:hover {
+  background: #252525;
+}
+
+.track-cover {
+  width: 55px;
+  height: 55px;
+  border-radius: 7px;
+  object-fit: cover;
+  background: #252525;
+}
+
+.track-info {
+  min-width: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.track-info strong,
+.track-info span {
+  display: block;
+}
+
+.track-info span {
+  color: #999;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.track button {
+  background: transparent;
+  color: white;
+}
+
+#preview {
+  width: 120px;
+  margin-top: 12px;
+}
+
+#status {
+  color: #bbb;
+  font-size: 13px;
+  margin: 15px 0;
+}
+
+@media (max-width: 500px) {
+  h1 {
+    font-size: 36px;
+  }
+
+  .player {
+    grid-template-columns: 100px 1fr;
+    gap: 12px;
+  }
+
+  .panel {
+    padding: 14px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:12px">
+    <button id="menuBtn" class="menu-button"
+      aria-label="Ouvrir le menu">☰</button>
+
+    <div class="brand">Dayod</div>
+  </div>
+
+  <button id="addBtn" class="primary">
+    + Ajouter
+  </button>
+</header>
+
+<nav id="menu" class="menu hidden">
+  <button id="menuAdd">♫ Ajouter une musique</button>
+  <button id="menuLibrary">▤ Ma bibliothèque</button>
+  <button id="menuClear">✕ Vider la bibliothèque</button>
+</nav>
+
+<main class="container">
+
+  <section>
+    <p class="muted">TON UNIVERS MUSICAL</p>
+
+    <h1>Ta musique.<br>
+      <span class="muted">Tes règles.</span>
+    </h1>
+
+    <p class="muted">
+      Bienvenue sur Dayod. Ajoute tes sons et personnalise tes albums.
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>Lecture en cours</h2>
+
+    <div class="player">
+      <div id="currentCover" class="cover">♫</div>
+
+      <div>
+        <h3 id="currentTitle">Aucune musique</h3>
+
+        <p id="currentAlbum" class="muted">
+          Ajoute ton premier morceau
+        </p>
+
+        <input id="progress" type="range"
+          min="0" max="100" value="0"
+          aria-label="Position de lecture">
+
+        <div style="display:flex;justify-content:space-between">
+          <small id="elapsed" class="muted">0:00</small>
+          <small id="duration" class="muted">0:00</small>
+        </div>
+
+        <div class="controls">
+          <button id="prev" class="secondary"
+            aria-label="Précédent">⏮</button>
+
+          <button id="play" class="play"
+            aria-label="Lecture ou pause">▶</button>
+
+          <button id="next" class="secondary"
+            aria-label="Suivant">⏭</button>
+
+          <button id="mute" class="secondary"
+            aria-label="Activer ou couper le son">🔊</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="library">
+    <h2>Ma bibliothèque</h2>
+    <p id="count" class="muted">0 morceau</p>
+
+    <div id="empty" class="panel" style="text-align:center">
+      <div style="font-size:45px;color:#777">♫</div>
+
+      <p>Ta collection est vide.</p>
+
+      <button id="emptyAdd" class="primary">
+        + Importer une musique
+      </button>
+    </div>
+
+    <div id="tracks" class="panel hidden"></div>
+  </section>
+
+  <section id="editor" class="panel hidden">
+    <h2>Ajouter une musique</h2>
+
+    <form id="musicForm">
+
+      <label>Fichier audio
+        <input id="audioFile" type="file"
+          accept="audio/*" required>
+      </label>
+
+      <label>Nom du morceau
+        <input id="songName" type="text"
+          placeholder="Nom de la musique"
+          maxlength="100" required>
+      </label>
+
+      <label>Nom de l'album
+        <input id="albumName" type="text"
+          placeholder="Nom de l'album"
+          maxlength="100">
+      </label>
+
+      <label>Image de la pochette
+        <input id="coverFile" type="file"
+          accept="image/*">
+      </label>
+
+      <div id="preview" class="cover">♫</div>
+
+      <p id="error" style="color:#ff9999"></p>
+
+      <button type="submit" class="primary"
+        style="width:100%;margin-top:20px">
+        Ajouter à ma bibliothèque
+      </button>
+
+      <button type="button" id="cancel"
+        class="secondary"
+        style="width:100%;margin-top:10px">
+        Annuler
+      </button>
+
+    </form>
+  </section>
+
+  <p id="status"></p>
+
+  <footer class="muted">
+    Dayod · Ta collection musicale
+  </footer>
+
+</main>
+
+<audio id="audio"></audio>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let songs = [];
+let current = -1;
+let coverData = "";
+let previewURL = "";
+let audioURL = "";
+
+const audio = $("audio");
+
+function formatTime(seconds) {
+  if (!Number.isFinite(seconds)) return "0:00";
+
+  return Math.floor(seconds / 60) + ":" +
+    String(Math.floor(seconds % 60)).padStart(2, "0");
+}
+
+function escapeHTML(text) {
+  return String(text).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function showEditor() {
+  $("editor").classList.remove("hidden");
+  $("error").textContent = "";
+
+  $("editor").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+function hideEditor() {
+  $("editor").classList.add("hidden");
+}
+
+function notify(message) {
+  $("status").textContent = message;
+}
+
+function coverHTML(song) {
+  return song.cover
+    ? `<img src="${song.cover}" alt="Pochette">`
+    : "♫";
+}
+
+function renderSongs() {
+  $("count").textContent =
+    songs.length + " morceau" +
+    (songs.length > 1 ? "x" : "");
+
+  $("empty").classList.toggle("hidden", songs.length > 0);
+  $("tracks").classList.toggle("hidden", songs.length === 0);
+
+  $("tracks").innerHTML = songs.map((song, i) => `
+    <div class="track">
+      <button data-play="${i}" aria-label="Lire">
+        <span class="track-cover cover">
+          ${coverHTML(song)}
+        </span>
+      </button>
+
+      <button class="track-info" data-play="${i}">
+        <strong>${escapeHTML(song.name)}</strong>
+        <span>${escapeHTML(song.album || "Sans album")}</span>
+      </button>
+
+      <div>
+        <button data-play="${i}" aria-label="Lire">▶</button>
+        <button data-delete="${i}" aria-label="Supprimer">✕</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function playSong(index) {
+  if (index < 0 || index >= songs.length) return;
+
+  current = index;
+  const song = songs[index];
+
+  if (audioURL) URL.revokeObjectURL(audioURL);
+
+  audioURL = URL.createObjectURL(song.file);
+  audio.src = audioURL;
+
+  $("currentTitle").textContent = song.name;
+  $("currentAlbum").textContent = song.album || "Sans album";
+  $("currentCover").innerHTML = coverHTML(song);
+
+  renderSongs();
+
+  try {
+    await audio.play();
+    notify("Lecture : " + song.name);
+  } catch {
+    notify("Appuie sur lecture pour démarrer.");
+  }
+}
+
+// Menu
+$("menuBtn").addEventListener("click", () => {
+  $("menu").classList.toggle("hidden");
+});
+
+$("addBtn").addEventListener("click", showEditor);
+$("emptyAdd").addEventListener("click", showEditor);
+
+$("menuAdd").addEventListener("click", () => {
+  $("menu").classList.add("hidden");
+  showEditor();
+});
+
+$("menuLibrary").addEventListener("click", () => {
+  $("menu").classList.add("hidden");
+
+  $("library").scrollIntoView({
+    behavior: "smooth"
+  });
+});
+
+$("cancel").addEventListener("click", hideEditor);
+
+// Nom automatique depuis le fichier
+$("audioFile").addEventListener("change", () => {
+  const file = $("audioFile").files[0];
+
+  if (file && !$("songName").value) {
+    $("songName").value =
+      file.name.replace(/\.[^.]+$/, "");
+  }
+});
+
+// Aperçu de la pochette
+$("coverFile").addEventListener("change", () => {
+  const file = $("coverFile").files[0];
+
+  if (previewURL) URL.revokeObjectURL(previewURL);
+
+  previewURL = "";
+  coverData = "";
+  $("preview").textContent = "♫";
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    $("error").textContent = "Choisis une image valide.";
+    $("coverFile").value = "";
+    return;
+  }
+
+  previewURL = URL.createObjectURL(file);
+
+  $("preview").innerHTML =
+    `<img src="${previewURL}" alt="Aperçu">`;
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    coverData = reader.result;
+  };
+
+  reader.readAsDataURL(file);
+});
+
+// Ajouter une musique
+$("musicForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const file = $("audioFile").files[0];
+  const name = $("songName").value.trim();
+
+  if (!file || !name) {
+    $("error").textContent =
+      "Choisis un fichier audio et donne-lui un nom.";
+    return;
+  }
+
+  if (!file.type.startsWith("audio/") &&
+      !/\.(mp3|wav|m4a|aac|ogg|flac|opus|wma)$/i.test(file.name)) {
+    $("error").textContent =
+      "Choisis un fichier audio valide.";
+    return;
+  }
+
+  songs.push({
+    file: file,
+    name: name,
+    album: $("albumName").value.trim(),
+    cover: coverData
+  });
+
+  $("musicForm").reset();
+  coverData = "";
+
+  if (previewURL) URL.revokeObjectURL(previewURL);
+  previewURL = "";
+
+  $("preview").textContent = "♫";
+  $("error").textContent = "";
+
+  hideEditor();
+  renderSongs();
+
+  playSong(songs.length - 1);
+});
+
+// Lecture et suppression
+$("tracks").addEventListener("click", event => {
+  const playButton = event.target.closest("[data-play]");
+  const deleteButton = event.target.closest("[data-delete]");
+
+  if (playButton) {
+    playSong(Number(playButton.dataset.play));
+  }
+
+  if (deleteButton) {
+    const index = Number(deleteButton.dataset.delete);
+
+    if (index === current) {
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+
+      current = -1;
+
+      $("currentTitle").textContent = "Aucune musique";
+      $("currentAlbum").textContent =
+        "Ajoute ton premier morceau";
+      $("currentCover").textContent = "♫";
+    } else if (index < current) {
+      current--;
+    }
+
+    songs.splice(index, 1);
+    renderSongs();
+    notify("Musique supprimée.");
+  }
+});
+
+// Commandes du lecteur
+$("play").addEventListener("click", async () => {
+  if (current < 0) {
+    if (songs.length) {
+      playSong(0);
+    } else {
+      showEditor();
+    }
+  } else if (audio.paused) {
+    try {
+      await audio.play();
+    } catch {
+      notify("Lecture impossible pour ce fichier.");
+    }
+  } else {
+    audio.pause();
+  }
+});
+
+$("prev").addEventListener("click", () => {
+  if (songs.length) {
+    playSong((current - 1 + songs.length) % songs.length);
+  }
+});
+
+$("next").addEventListener("click", () => {
+  if (songs.length) {
+    playSong((current + 1) % songs.length);
+  }
+});
+
+audio.addEventListener("play", () => {
+  $("play").textContent = "Ⅱ";
+});
+
+audio.addEventListener("pause", () => {
+  $("play").textContent = "▶";
+});
+
+audio.addEventListener("timeupdate", () => {
+  $("elapsed").textContent = formatTime(audio.currentTime);
+  $("duration").textContent = formatTime(audio.duration);
+
+  $("progress").value = audio.duration
+    ? audio.currentTime / audio.duration * 100
+    : 0;
+});
+
+audio.addEventListener("ended", () => {
+  if (songs.length) {
+    playSong((current + 1) % songs.length);
+  }
+});
+
+$("progress").addEventListener("input", () => {
+  if (audio.duration) {
+    audio.currentTime =
+      Number($("progress").value) / 100 * audio.duration;
+  }
+});
+
+$("mute").addEventListener("click", () => {
+  audio.muted = !audio.muted;
+  $("mute").textContent = audio.muted ? "🔇" : "🔊";
+});
+
+// Vider la bibliothèque
+$("menuClear").addEventListener("click", () => {
+  if (!confirm("Supprimer toutes les musiques ?")) return;
+
+  audio.pause();
+  audio.removeAttribute("src");
+  audio.load();
+
+  if (audioURL) URL.revokeObjectURL(audioURL);
+
+  audioURL = "";
+  songs = [];
+  current = -1;
+
+  $("currentTitle").textContent = "Aucune musique";
+  $("currentAlbum").textContent =
+    "Ajoute ton premier morceau";
+  $("currentCover").textContent = "♫";
+
+  $("menu").classList.add("hidden");
+
+  renderSongs();
+  notify("Bibliothèque vidée.");
+});
+
+renderSongs();
+</script>
+
+</body>
+</html>
